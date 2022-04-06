@@ -10,6 +10,22 @@ import { useSelector } from "react-redux";
 import UserProfile from "../components/UserProfile";
 import LoginForm from "../components/LoginForm";
 
+import { createGlobalStyle } from "styled-components";
+
+//하단 스크롤이 생기는 것을 없애기 위한 스타일
+const Global = createGlobalStyle`
+  .ant-row{
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+  }
+  .ant-col:first-child{
+    padding-left: 0 !important;
+  }
+  .ant-col:last-child{
+    padding-right: 0 !important;
+  }
+`;
+
 const SerchInput = styled(Input.Search)`
   vertical-align: middle;
 `;
@@ -18,6 +34,7 @@ const AppLayout = ({ children }) => {
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
   return (
     <div>
+      <Global />
       <Menu mode="horizontal">
         <Menu.Item key="/">
           <Link href="/">
