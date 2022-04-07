@@ -39,10 +39,12 @@ export const initialState = {
 };
 
 //게시글 작성하는 액션
-const ADD_POST = "ADD_POST";
+const ADD_POST_REQUEST = "ADD_POST_REQUEST";
+
 export const addPost = {
-  type: ADD_POST,
+  type: ADD_POST_REQUEST,
 };
+
 const dummyPost = {
   id: 2,
   content: "더미데이터입니다.",
@@ -56,12 +58,16 @@ const dummyPost = {
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case ADD_POST:
+    case ADD_POST_REQUEST:
       return {
         ...state,
         mainPosts: [dummyPost, ...state.mainPosts],
         postAdded: true,
       };
+    case "ADD_POST_SUCCESS":
+      return {};
+    case "ADD_POST_FAILURE":
+      return {};
     default:
       return state;
   }
