@@ -1,5 +1,6 @@
 import { all, delay, put, takeLatest, fork } from "redux-saga/effects";
 import axios from "axios";
+
 import {
   ADD_POST_REQUEST,
   ADD_POST_SUCCESS,
@@ -24,7 +25,7 @@ function* addPost(action) {
     //성공
     yield put({
       type: ADD_POST_SUCCESS,
-      data: result.data,
+      data: action.data,
     });
   } catch (err) {
     //실패
@@ -49,7 +50,7 @@ function* addComment(action) {
     //성공
     yield put({
       type: ADD_COMMENT_SUCCESS,
-      data: result.data,
+      data: action.data,
     });
   } catch (err) {
     //실패

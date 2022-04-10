@@ -41,12 +41,12 @@ export const UNFOLLOW_SUCCESS = "UNFOLLOW_SUCCESS";
 export const UNFOLLOW_FAILURE = "UNFOLLOW_FAILURE";
 
 const dummyUser = (data) => ({
-  ...action.data,
+  ...data,
   nickname: "제로초",
   id: 1,
   Posts: [],
   Followings: [],
-  Foolowers: [],
+  Followers: [],
 });
 
 export const loginRequestAction = (data) => {
