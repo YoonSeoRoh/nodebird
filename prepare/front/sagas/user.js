@@ -56,7 +56,6 @@ function* logOut() {
     //성공
     yield put({
       type: LOG_OUT_SUCCESS,
-      data: result.data,
     });
   } catch (err) {
     //실패
