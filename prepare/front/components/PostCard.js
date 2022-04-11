@@ -20,12 +20,8 @@ const PostCard = ({ post }) => {
   const [commentFormOpened, setCommentFormOpened] = useState(false);
   const [liked, setLiked] = useState(false);
   const { me } = useSelector((state) => state.user);
+
   const id = me && me.id;
-  const content = (
-    <div>
-      <p>content</p>
-    </div>
-  );
   const onToggleLike = useCallback(() => {
     setLiked((prev) => !prev);
   }, []);
@@ -57,9 +53,20 @@ const PostCard = ({ post }) => {
             <HeartOutlined key="heart" onClick={onToggleLike} />
           ),
           <MessageOutlined key="message" onClick={onToggleComment} />,
-          <Popover key="more" content={content}>
-            <Button>etc</Button>
-          </Popover>,
+          id && post.User.id === id ? (
+            <>
+              <Button>수정</Button>
+              <Button
+                type="danger"
+                loading={removePostLoading}
+                onClick={onRemovePost}
+              >
+                삭제
+              </Button>
+            </>
+          ) : (
+            <Button>신고</Button>
+          ),
         ]}
       >
         <Card.Meta
