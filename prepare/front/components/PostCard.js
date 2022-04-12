@@ -12,6 +12,7 @@ import { useSelector, useDispatch } from "react-redux";
 import CommentForm from "./CommentForm";
 import PostCardContent from "./PostCardContent";
 import PostImages from "./PostImages";
+import FollowButton from "./FollowButton";
 import { REMOVE_POST_REQUEST } from "../reducers/post";
 
 const PostCard = ({ post }) => {
@@ -68,6 +69,7 @@ const PostCard = ({ post }) => {
             <Button>신고</Button>
           ),
         ]}
+        extra={id && <FollowButton post={post} />}
       >
         <Card.Meta
           avatar={<Avatar>{post.User.nickname[0]}</Avatar>}
