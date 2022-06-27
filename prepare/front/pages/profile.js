@@ -8,12 +8,13 @@ import Router from "next/router";
 
 const Profile = () => {
   const { me } = useSelector((state) => state.user);
+
   useEffect(() => {
     //프로필 페이지에 있다가 로그아웃을 하는 경우
     if (!(me && me.id)) {
       Router.push("/");
     }
-  });
+  }, [me && me.id]);
   if (!me) {
     return null;
   }

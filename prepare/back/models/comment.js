@@ -25,7 +25,7 @@ module.exports = class Comment extends Model {
   }
 
   static associate(db) {
-    db.Comment.belongsTo(db.User); //어떤 한 댓글은 유저에 속해있음
-    db.Comment.belongsTo(db.Post);
+    db.Comment.belongsTo(db.User); //어떤 한 댓글은 하나의 유저에 속해있음
+    db.Comment.belongsTo(db.Post); //어떤 한 댓글은 하나의 포스트에 속해 있음
   }
 };

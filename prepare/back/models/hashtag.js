@@ -22,6 +22,6 @@ module.exports = class Hashtag extends Model {
     );
   }
   static associate(db) {
-    db.Hashtag.belongsToMany(db.Post, { through: "PostHashtag" });
+    db.Hashtag.belongsToMany(db.Post, { through: "PostHashtag" }); //M:N, through로 중간 테이블 이름 바꿔주기
   }
 };

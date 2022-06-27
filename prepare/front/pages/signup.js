@@ -1,7 +1,8 @@
 import AppLayout from "../components/AppLayout";
 import Head from "next/head";
+import Router from "next/router";
 import { Form, Input, Checkbox, Button } from "antd";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import useInput from "../hooks/useInput";
 import styled from "styled-components";
@@ -13,7 +14,24 @@ const ErrorMessage = styled.div`
 
 const Signup = () => {
   const dispatch = useDispatch();
-  const { signUpLoading } = useSelector((state) => state.user);
+  const { signUpLoading, signUpDone, signUpError } = useSelector(
+    (state) => state.user
+  );
+
+  //회원가입 완료 시 메인 페이지로
+  useEffect(() => {
+    if (signUpDone) {
+      Router.push("/");
+    }
+  }, [signUpDone]);
+
+  //회원가입 시 에러가 난 경우
+  useEffect(() => {
+    if (signUpError) {
+      alert(signUpError);
+    }
+  }, [signUpError]);
+
   const [email, onChangeEmail] = useInput("");
   const [nickname, onChangeNickname] = useInput("");
   const [password, onChangePassword] = useInput("");
