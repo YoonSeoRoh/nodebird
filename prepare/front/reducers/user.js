@@ -2,6 +2,9 @@ import shortId from "shortid";
 import produce from "immer";
 
 export const initialState = {
+  loadMyInfoLoading: false, //사용자 정보 가져오기 시도중
+  loadMyInfoDone: false,
+  loadMyInfoError: null,
   logInLoading: false, //로그인 시도중->true면 로딩창을 띄움
   logInDone: false,
   logInError: null,
@@ -24,6 +27,10 @@ export const initialState = {
   signUpData: {},
   loginData: {},
 };
+
+export const LOAD_MY_INFO_REQUEST = "LOAD_MY_INFO_REQUEST";
+export const LOAD_MY_INFO_SUCCESS = "LOAD_MY_INFO_SUCCESS";
+export const LOAD_MY_INFO_FAILURE = "LOAD_MY_INFO_FAILURE";
 
 export const LOG_IN_REQUEST = "LOG_IN_REQUEST";
 export const LOG_IN_SUCCESS = "LOG_IN_SUCCESS";
@@ -85,6 +92,20 @@ export const logoutRequestAction = (data) => {
 const reducer = (state = initialState, action) => {
   return produce(state, (draft) => {
     switch (action.type) {
+      case LOAD_MY_INFO_REQUEST:
+        draft.loadMyInfoLoading = true;
+        draft.loadMyInfoError = null;
+        draft.loadMyInfoDone = false;
+        break;
+      case LOAD_MY_INFO_SUCCESS:
+        draft.loadMyInfoLoading = false;
+        draft.me = action.data;
+        draft.loadMyInfoDone = true;
+        break;
+      case LOAD_MY_INFO_FAILURE:
+        draft.loadMyInfoLoading = false;
+        draft.loadMyInfoError = action.error;
+        break;
       case FOLLOW_REQUEST:
         draft.followLoading = true;
         draft.followError = null;
@@ -180,105 +201,6 @@ const reducer = (state = initialState, action) => {
         break;
     }
   });
-  // switch (action.type) {
-  //   case LOG_IN_REQUEST:
-  //     console.log("reducer login");
-  //     return {
-  //       ...state,
-  //       logInLoading: true,
-  //       logInDone: false,
-  //       logInError: null,
-  //     };
-  //   case LOG_IN_SUCCESS:
-  //     return {
-  //       ...state,
-  //       logInLoading: false,
-  //       logInDone: true,
-  //       me: dummyUser(action.data),
-  //     };
-  //   case LOG_IN_FAILURE:
-  //     return {
-  //       ...state,
-  //       logInLoading: false,
-  //       logInError: action.error,
-  //     };
-  //   case LOG_OUT_REQUEST:
-  //     return {
-  //       ...state,
-  //       logOutLoading: true,
-  //       logOutDone: false,
-  //       logOutError: null,
-  //     };
-  //   case LOG_OUT_SUCCESS:
-  //     return {
-  //       ...state,
-  //       logOutLoading: false,
-  //       logOutDone: true,
-  //       me: null,
-  //     };
-  //   case LOG_OUT_FAILURE:
-  //     return {
-  //       ...state,
-  //       logOutLoading: false,
-  //       logOutError: action.error,
-  //     };
-  //   case SIGN_UP_REQUEST:
-  //     return {
-  //       ...state,
-  //       signUpLoading: true,
-  //       signUpDone: false,
-  //       signUpError: null,
-  //     };
-  //   case SIGN_UP_SUCCESS:
-  //     return {
-  //       ...state,
-  //       signUpLoading: false,
-  //       signUpDone: true,
-  //     };
-  //   case SIGN_UP_FAILURE:
-  //     return {
-  //       ...state,
-  //       signUpLoading: false,
-  //       signUpError: action.error,
-  //     };
-  //   case CHANGE_NICKNAME_REQUEST:
-  //     return {
-  //       ...state,
-  //       changeNicknameLoading: true,
-  //       changeNicknameDone: false,
-  //       changeNicknameError: null,
-  //     };
-  //   case CHANGE_NICKNAME_SUCCESS:
-  //     return {
-  //       ...state,
-  //       changeNicknameLoading: false,
-  //       changeNicknameDone: true,
-  //     };
-  //   case CHANGE_NICKNAME_FAILURE:
-  //     return {
-  //       ...state,
-  //       changeNicknameLoading: false,
-  //       changeNicknameError: action.error,
-  //     };
-  //   case ADD_POST_TO_ME:
-  //     return {
-  //       ...state,
-  //       me: {
-  //         ...state.me,
-  //         Posts: [{ id: action.data }, ...state.me.Posts],
-  //       },
-  //     };
-  //   case REMOVE_POST_OF_ME:
-  //     return {
-  //       ...state,
-  //       me: {
-  //         ...state.me,
-  //         Posts: state.me.Posts.filter((v) => v.id !== action.data),
-  //       },
-  //     };
-  //   default:
-  //     return state;
-  // }
 };
 
 export default reducer;

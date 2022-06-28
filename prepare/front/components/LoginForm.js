@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { Form, Input, Button } from "antd";
 import Link from "next/link";
 import styled from "styled-components";
@@ -16,9 +16,17 @@ const FormWrapper = styled(Form)`
 
 const LoginForm = () => {
   const dispatch = useDispatch();
-  const { logInLoading } = useSelector((state) => state.user);
+  const { logInLoading, logInError } = useSelector((state) => state.user);
   const [email, onChangeEmail] = useInput("");
   const [password, onChangePassword] = useInput("");
+
+  //로그인 실패 시 에러 메세지 전달
+  useEffect(() => {
+    if (logInError) {
+      alert(logInError);
+    }
+  }, [logInError]);
+
   const onSubmitForm = useCallback(() => {
     console.log(email, password);
     dispatch(loginRequestAction({ email, password }));

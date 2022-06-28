@@ -8,6 +8,7 @@ module.exports = () => {
     done(null, user.id);
   });
   //아이디를 통해서 유저 정보 복구
+  //로그인 후 실행
   passport.deserializeUser(async (id, done) => {
     try {
       const user = await User.findOne({

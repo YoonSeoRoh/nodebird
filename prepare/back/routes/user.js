@@ -1,12 +1,12 @@
 //user 관련 api
 const express = require("express");
 const bcrypt = require("bcrypt");
-const { User } = require("../models");
-
+const { User, Post } = require("../models");
+const { isLoggedIn, isNotLoggedIn } = require("./middlewares");
 const router = express.Router();
 
-//회원가입
-router.post("/", async (req, res, next) => {
+//회원가입 -> 로그인 안한 사람들만
+router.post("/", isNotLoggedIn, async (req, res, next) => {
   // POST/user
   try {
     //async await -> 비동기 방지 -> 붙이지 않으면 res.send()이 먼저 실행됨
@@ -35,10 +35,10 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-//로그인
+//로그인 -> 로그인 안한 사람들만
 //미들웨어 확장(passport에서 req, res, next를 쓸 수 있도록)
 const passport = require("passport");
-router.post("/login", (req, res, next) => {
+router.post("/login", isNotLoggedIn, (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     //전달된 서버에러+user객체+클라이언트에러
     if (err) {
@@ -58,16 +58,57 @@ router.post("/login", (req, res, next) => {
         return next(loginErr);
       }
       //사용자 정보를 프론트로 넘김
-      return res.status(200).json(user);
+      //비밀번호는 넘기지 않고 포스트와 팔로윙 팔로워는 포함
+      const fullUserWithoutPassword = await User.findOne({
+        where: { id: user.id },
+        attributes: {
+          exclude: ["password"],
+        },
+        include: [
+          {
+            model: Post,
+          },
+          {
+            model: User,
+            as: "Followings",
+          },
+          {
+            model: User,
+            as: "Followers",
+          },
+        ],
+      });
+      return res.status(200).json(fullUserWithoutPassword);
     });
   })(req, res, next);
 });
 
-//로그아웃
-router.post("/user/logout", (req, res, next) => {
-  req.logout();
+//로그아웃 -> 로그인 한 사람들만
+//세션 삭제
+router.post("/logout", isLoggedIn, (req, res, next) => {
+  req.logout(() => {});
   req.session.destroy();
   res.send("ok");
+});
+
+//사용자 정보를 복구 -> 새로고침해도 로그인 상태 유지 -> 사용자 로그인이 되어 있을 경우에만
+router.get("/", async (req, res, next) => {
+  // GET/user
+  try {
+    if (req.user) {
+      //로그인이 되어 있다면 사용자 정보 보냄
+      const user = await User.findOne({
+        where: { id: req.user.id },
+      });
+      res.status(200).json(user);
+    } else {
+      //로그인이 되어 있지 않다면 아무것도 보내지 않음
+      res.status(200).json(null);
+    }
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
 });
 
 module.exports = router;

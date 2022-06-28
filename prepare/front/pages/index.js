@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import PostForm from "../components/PostForm";
 import PostCard from "../components/PostCard";
 import { LOAD_POSTS_REQUEST } from "../reducers/post";
+import { LOAD_MY_INFO_REQUEST } from "../reducers/user";
 
 const Home = () => {
   //화면 로딩 시 포스트 불러오기
@@ -12,7 +13,11 @@ const Home = () => {
   const { mainPosts, hasMorePosts, loadPostsLoading } = useSelector(
     (state) => state.post
   );
+  //유저 정보 불러오기 + 게시글 불러오기
   useEffect(() => {
+    dispatch({
+      type: LOAD_MY_INFO_REQUEST,
+    });
     dispatch({
       type: LOAD_POSTS_REQUEST,
     });

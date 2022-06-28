@@ -1,6 +1,9 @@
 import { all, delay, put, takeLatest, fork, call } from "redux-saga/effects";
 import axios from "axios";
 import {
+  LOAD_MY_INFO_REQUEST,
+  LOAD_MY_INFO_SUCCESS,
+  LOAD_MY_INFO_FAILURE,
   LOG_IN_REQUEST,
   LOG_IN_SUCCESS,
   LOG_IN_FAILURE,
@@ -17,6 +20,28 @@ import {
   UNFOLLOW_SUCCESS,
   UNFOLLOW_FAILURE,
 } from "../reducers/user";
+
+function loadMyInfoAPI() {
+  //실제 서버에 요청
+  return axios.get("/user");
+}
+
+function* loadMyInfo(action) {
+  try {
+    const result = yield call(loadMyInfoAPI, action.data);
+    //성공
+    yield put({
+      type: LOAD_MY_INFO_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    //실패
+    yield put({
+      type: LOAD_MY_INFO_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
 
 function followAPI(data) {
   //실제 서버에 요청
@@ -108,8 +133,7 @@ function* logOut() {
   //put은 dispatch와 같은 역할
   //액션 객체를 dispatch하는 것
   try {
-    //const result = yield call(logOutAPI);
-    yield delay(2000);
+    yield call(logOutAPI);
     //성공
     yield put({
       type: LOG_OUT_SUCCESS,
@@ -146,6 +170,10 @@ function* signUp(action) {
   }
 }
 
+function* watchLoadMyInfo() {
+  yield takeLatest(LOAD_MY_INFO_REQUEST, loadMyInfo);
+}
+
 function* watchFollow() {
   yield takeLatest(FOLLOW_REQUEST, follow);
 }
@@ -168,6 +196,7 @@ function* watchSignUp() {
 
 export default function* userSaga() {
   yield all([
+    fork(watchLoadMyInfo),
     fork(watchFollow),
     fork(watchUnfollow),
     fork(watchLogIn),
