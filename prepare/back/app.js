@@ -9,6 +9,10 @@ app.get("/", (req, res) => {
 const dotenv = require("dotenv");
 dotenv.config();
 
+//morgan
+const morgan = require("morgan");
+app.use(morgan("dev"));
+
 //서버 실행 시 db sequelize 연결도 동시에 진행
 const db = require("./models");
 db.sequelize
@@ -59,6 +63,10 @@ app.use(passport.session());
 //post 관련 api
 const postRouter = require("./routes/post");
 app.use("/post", postRouter);
+
+//posts 관련 api
+const postsRouter = require("./routes/posts");
+app.use("/posts", postsRouter);
 
 //user 관련 api
 const userRouter = require("./routes/user");

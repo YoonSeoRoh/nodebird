@@ -97,10 +97,29 @@ router.get("/", async (req, res, next) => {
   try {
     if (req.user) {
       //로그인이 되어 있다면 사용자 정보 보냄
-      const user = await User.findOne({
+      const fullUserWithoutPassword = await User.findOne({
         where: { id: req.user.id },
+        attributes: {
+          exclude: ["password"],
+        },
+        include: [
+          {
+            model: Post,
+            attributes: ["id"], //필요한 데이터만 -> id만 알아도 몇명인지, 몇개인지 알 수 있음
+          },
+          {
+            model: User,
+            as: "Followings",
+            attributes: ["id"],
+          },
+          {
+            model: User,
+            as: "Followers",
+            attributes: ["id"],
+          },
+        ],
       });
-      res.status(200).json(user);
+      res.status(200).json(fullUserWithoutPassword);
     } else {
       //로그인이 되어 있지 않다면 아무것도 보내지 않음
       res.status(200).json(null);

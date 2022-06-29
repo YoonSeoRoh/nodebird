@@ -23,7 +23,7 @@ module.exports = class Post extends Model {
     );
   }
   static associate(db) {
-    db.Post.belongsTo(db.User); // post.addUser, post.getUser, post.setUser -> 하나의 포스트는 유저에 속해있음
+    db.Post.belongsTo(db.User); // post.addUser, post.getUser, post.setUser(수정) -> 하나의 포스트는 유저에 속해있음
     db.Post.belongsToMany(db.Hashtag, { through: "PostHashtag" }); // post.addHashtags
     db.Post.hasMany(db.Comment); // post.addComments, post.getComments -> 하나의 포스트는 여러 개의 댓글을 가지고 있음
     db.Post.hasMany(db.Image); // post.addImages, post.getImages -> 하나의 포스트는 여러 개의 이미지를 가지고 있음

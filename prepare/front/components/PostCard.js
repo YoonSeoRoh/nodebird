@@ -13,18 +13,30 @@ import CommentForm from "./CommentForm";
 import PostCardContent from "./PostCardContent";
 import PostImages from "./PostImages";
 import FollowButton from "./FollowButton";
-import { REMOVE_POST_REQUEST } from "../reducers/post";
+import {
+  LIKE_POST_REQUEST,
+  UNLIKE_POST_REQUEST,
+  REMOVE_POST_REQUEST,
+} from "../reducers/post";
 
 const PostCard = ({ post }) => {
   const dispatch = useDispatch();
   const { removePostLoading } = useSelector((state) => state.post);
   const [commentFormOpened, setCommentFormOpened] = useState(false);
-  const [liked, setLiked] = useState(false);
   const { me } = useSelector((state) => state.user);
 
   const id = me && me.id;
-  const onToggleLike = useCallback(() => {
-    setLiked((prev) => !prev);
+  const onLike = useCallback(() => {
+    dispatch({
+      type: LIKE_POST_REQUEST,
+      data: post.id,
+    });
+  }, []);
+  const onUnlike = useCallback(() => {
+    dispatch({
+      type: UNLIKE_POST_REQUEST,
+      data: post.id,
+    });
   }, []);
 
   const onToggleComment = useCallback(() => {
@@ -37,7 +49,7 @@ const PostCard = ({ post }) => {
       data: post.id,
     });
   }, []);
-
+  const liked = post.Likers.find((v) => v.id === id); //게시글 좋아요 누른 사람들 중 내가 있는지
   return (
     <div style={{ marginBottom: 20 }}>
       <Card
@@ -48,10 +60,10 @@ const PostCard = ({ post }) => {
             <HeartTwoTone
               twoToneColor="#eb2f96"
               key="heart"
-              onClick={onToggleLike}
+              onClick={onUnlike}
             />
           ) : (
-            <HeartOutlined key="heart" onClick={onToggleLike} />
+            <HeartOutlined key="heart" onClick={onLike} />
           ),
           <MessageOutlined key="message" onClick={onToggleComment} />,
           id && post.User.id === id ? (
@@ -102,13 +114,14 @@ const PostCard = ({ post }) => {
 
 PostCard.propTypes = {
   post: PropTypes.shape({
-    id: PropTypes.string,
+    id: PropTypes.number,
     User: PropTypes.object,
     UserId: PropTypes.number,
     content: PropTypes.string,
-    createdAt: PropTypes.object,
+    createdAt: PropTypes.string,
     Comments: PropTypes.arrayOf(PropTypes.any),
     Images: PropTypes.arrayOf(PropTypes.any),
+    Likers: PropTypes.arrayOf(PropTypes.object),
   }).isRequired,
 };
 

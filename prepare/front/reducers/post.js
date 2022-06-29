@@ -1,50 +1,7 @@
-import shortId from "shortid";
 import produce from "immer";
-import faker from "faker";
 
 export const initialState = {
-  mainPosts: [
-    // {
-    //   id: 1,
-    //   User: {
-    //     id: 1,
-    //     nickname: "제로초",
-    //   },
-    //   content: "첫 번째 게시글 #해시태그 #익스프레스",
-    //   Images: [
-    //     {
-    //       id: shortId.generate(),
-    //       src: "https://gimg.gilbut.co.kr/book/BN001958/rn_view_BN001958.jpg",
-    //     },
-    //     {
-    //       id: shortId.generate(),
-    //       src: "https://bookthumb-phinf.pstatic.net/cover/137/995/13799585.jpg?udate=20180726",
-    //     },
-    //     {
-    //       id: shortId.generate(),
-    //       src: "https://gimg.gilbut.co.kr/book/BN001998/rn_view_BN001998.jpg",
-    //     },
-    //   ],
-    //   Comments: [
-    //     {
-    //       id: shortId.generate(),
-    //       User: {
-    //         id: shortId.generate(),
-    //         nickname: "nero",
-    //       },
-    //       content: "개정판이 나왔군요~",
-    //     },
-    //     {
-    //       id: shortId.generate(),
-    //       User: {
-    //         id: shortId.generate(),
-    //         nickname: "me",
-    //       },
-    //       content: "얼른 사고싶어요~",
-    //     },
-    //   ],
-    // },
-  ],
+  mainPosts: [],
   imagePaths: [],
   hasMorePosts: true,
   loadPostsLoading: false,
@@ -59,35 +16,13 @@ export const initialState = {
   removePostLoading: false,
   removePostDone: false,
   removePostError: null,
+  likePostLoading: false,
+  likePostDone: false,
+  likePostError: null,
+  unlikePostLoading: false,
+  unlikePostDone: false,
+  unlikePostError: null,
 };
-
-//인피니트 스크롤링을 위해 함수로 구현
-//서버에서 데이터를 받아오는 것처럼 구현하기 위한 함수
-export const generateDummyPost = (number) =>
-  Array(number)
-    .fill()
-    .map(() => ({
-      id: shortId.generate(),
-      User: {
-        id: shortId.generate(),
-        nickname: faker.name.findName(),
-      },
-      content: faker.lorem.paragraph(),
-      Images: [
-        {
-          src: faker.image.image(),
-        },
-      ],
-      Comments: [
-        {
-          User: {
-            id: shortId.generate(),
-            nickname: faker.name.findName(),
-          },
-          content: faker.lorem.sentence(),
-        },
-      ],
-    }));
 
 //처음 화면을 로딩하면 LOAT_POSTS_REQUEST를 실행
 export const LOAD_POSTS_REQUEST = "LOAD_POSTS_REQUEST";
@@ -105,6 +40,14 @@ export const ADD_COMMENT_FAILURE = "ADD_COMMENT_FAILURE";
 export const REMOVE_POST_REQUEST = "REMOVE_POST_REQUEST";
 export const REMOVE_POST_SUCCESS = "REMOVE_POST_SUCCESS";
 export const REMOVE_POST_FAILURE = "REMOVE_POST_FAILURE";
+
+export const LIKE_POST_REQUEST = "LIKE_POST_REQUEST";
+export const LIKE_POST_SUCCESS = "LIKE_POST_SUCCESS";
+export const LIKE_POST_FAILURE = "LIKE_POST_FAILURE";
+
+export const UNLIKE_POST_REQUEST = "UNLIKE_POST_REQUEST";
+export const UNLIKE_POST_SUCCESS = "UNLIKE_POST_SUCCESS";
+export const UNLIKE_POST_FAILURE = "UNLIKE_POST_FAILURE";
 
 export const addPost = (data) => ({
   type: ADD_POST_REQUEST,
@@ -177,6 +120,38 @@ const reducer = (state = initialState, action) => {
       case ADD_COMMENT_FAILURE:
         draft.addCommentLoading = false;
         draft.addCommentError = action.error;
+      case LIKE_POST_REQUEST:
+        draft.likePostLoading = true;
+        draft.likePostDone = false;
+        draft.likePostError = null;
+        break;
+      case LIKE_POST_SUCCESS: {
+        const post = draft.mainPosts.find((v) => v.id === action.data.PostId);
+        post.Likers.push({ id: action.data.UserId });
+        draft.likePostLoading = false;
+        draft.likePostDone = true;
+        break;
+      }
+      case LIKE_POST_FAILURE:
+        draft.likePostLoading = false;
+        draft.likePostError = action.error;
+        break;
+      case UNLIKE_POST_REQUEST:
+        draft.unlikePostLoading = true;
+        draft.unlikePostDone = false;
+        draft.unlikePostError = null;
+        break;
+      case UNLIKE_POST_SUCCESS: {
+        const post = draft.mainPosts.find((v) => v.id === action.data.PostId);
+        post.Likers.fliter((v) => v.id !== action.data.UserId);
+        draft.unlikePostLoading = false;
+        draft.unlikePostDone = true;
+        break;
+      }
+      case UNLIKE_POST_FAILURE:
+        draft.unlikePostLoading = false;
+        draft.unlikePostError = action.error;
+        break;
       default:
         break;
     }
