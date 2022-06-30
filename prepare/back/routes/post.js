@@ -48,6 +48,21 @@ router.post("/", isLoggedIn, async (req, res, next) => {
   }
 });
 
+//포스트 삭제
+router.delete("/:postId", isLoggedIn, async (req, res, next) => {
+  // DELETE/post/postId
+  try {
+    await Post.destroy({
+      where: { id: req.params.postId },
+      UserId: req.user.id, //내가 쓴 게시글만 삭제 가능
+    });
+    res.status(200).json({ PostId: parseInt(req.params.postId, 10) });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
 //댓글 생성 -> 로그인 한 사람들만
 router.post("/:postId/comment", isLoggedIn, async (req, res, next) => {
   // POST/post/post.id/comment
@@ -83,7 +98,7 @@ router.post("/:postId/comment", isLoggedIn, async (req, res, next) => {
 });
 
 //좋아요 추가
-router.patch("/:postId/like", async (req, res, next) => {
+router.patch("/:postId/like", isLoggedIn, async (req, res, next) => {
   // PATCH/post/postId/like
   try {
     //포스트가 있는지 검사
@@ -100,7 +115,7 @@ router.patch("/:postId/like", async (req, res, next) => {
 });
 
 //좋아요 삭제
-router.delete("/:postId/like", async (req, res, next) => {
+router.delete("/:postId/like", isLoggedIn, async (req, res, next) => {
   // DELETE/post/postId/like
   try {
     //포스트가 있는지 검사

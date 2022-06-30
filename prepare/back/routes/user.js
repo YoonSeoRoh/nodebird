@@ -130,4 +130,56 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+//닉네임 수정
+router.patch("/nickname", isLoggedIn, async (req, res, next) => {
+  try {
+    await User.update(
+      {
+        //수정
+        nickname: req.body.nickname, //무엇을 -> 닉네임을 프론트에서 받은 닉네임으로
+      },
+      {
+        where: { id: req.user.id }, //조건 -> 내 아이디의 닉네임을 수정
+      }
+    );
+    res.status(200).json({ nickname: req.body.nickname });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+//팔로우
+router.patch("/:userId/follow", isLoggedIn, async (req, res, next) => {
+  // PATCH/user/userId/follow
+  try {
+    //해당 유저가 있는지 확인
+    const user = await User.findOne({ where: { id: req.params.userId } });
+    if (!user) {
+      res.status(403).send("없는 사용자입니다.");
+    }
+    await user.addFollowers(req.user.id); //상대방의 팔로워 목록에 나를 추가
+    res.status(200).json({ UserId: parseInt(req.params.userId, 10) }); //팔로우 대상의 아이디를 반환
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+//팔로우 취소
+router.delete("/:userId/follow", isLoggedIn, async (req, res, next) => {
+  try {
+    //해당 유저가 있는지 확인
+    const user = await User.findOne({ where: { id: req.params.userId } });
+    if (!user) {
+      res.status(403).send("없는 사용자입니다.");
+    }
+    await user.removeFollowers(req.user.id); //상대방의 팔로워 목록에 나를 추가
+    res.status(200).json({ UserId: parseInt(req.params.userId, 10) }); //팔로우 대상의 아이디를 반환
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
 module.exports = router;

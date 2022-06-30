@@ -20,15 +20,15 @@ const Signup = () => {
 
   //로그인 성공하면 회원가입 페이지에서 나가도록
   useEffect(() => {
-    if (!(me && me.id)) {
-      Router.push("/");
+    if (me && me.id) {
+      Router.replace("/");
     }
   }, [me && me.id]);
 
   //회원가입 완료 시 메인 페이지로
   useEffect(() => {
     if (signUpDone) {
-      Router.push("/");
+      Router.replace("/");
     }
   }, [signUpDone]);
 

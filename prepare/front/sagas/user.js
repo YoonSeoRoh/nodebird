@@ -19,6 +19,9 @@ import {
   UNFOLLOW_REQUEST,
   UNFOLLOW_SUCCESS,
   UNFOLLOW_FAILURE,
+  CHANGE_NICKNAME_REQUEST,
+  CHANGE_NICKNAME_SUCCESS,
+  CHANGE_NICKNAME_FAILURE,
 } from "../reducers/user";
 
 function loadMyInfoAPI() {
@@ -36,6 +39,7 @@ function* loadMyInfo(action) {
     });
   } catch (err) {
     //실패
+    console.log(err);
     yield put({
       type: LOAD_MY_INFO_FAILURE,
       error: err.response.data,
@@ -45,21 +49,15 @@ function* loadMyInfo(action) {
 
 function followAPI(data) {
   //실제 서버에 요청
-  return axios.post("/api/follow", data);
+  return axios.patch(`/user/${data}/follow`);
 }
 function* follow(action) {
-  //로그인 요청에 대한 결과를 받음
-  //요청 성공, 실패에 대비
-  //put은 dispatch와 같은 역할
-  //액션 객체를 dispatch하는 것
   try {
-    //const result = yield call(followAPI, action.data);
-    //fake 서버 효과 주기 위해
-    yield delay(2000);
+    const result = yield call(followAPI, action.data);
     //성공
     yield put({
       type: FOLLOW_SUCCESS,
-      data: action.data,
+      data: result.data,
     });
   } catch (err) {
     //실패
@@ -72,21 +70,15 @@ function* follow(action) {
 
 function unfollowAPI(data) {
   //실제 서버에 요청
-  return axios.post("/api/unfollow", data);
+  return axios.delete(`/user/${data}/follow`);
 }
 function* unfollow(action) {
-  //로그인 요청에 대한 결과를 받음
-  //요청 성공, 실패에 대비
-  //put은 dispatch와 같은 역할
-  //액션 객체를 dispatch하는 것
   try {
-    //const result = yield call(unfollowAPI, action.data);
-    //fake 서버 효과 주기 위해
-    yield delay(2000);
+    const result = yield call(unfollowAPI, action.data);
     //성공
     yield put({
       type: UNFOLLOW_SUCCESS,
-      data: action.data,
+      data: result.data,
     });
   } catch (err) {
     //실패
@@ -106,7 +98,6 @@ function* logIn(action) {
   //put은 dispatch와 같은 역할
   //액션 객체를 dispatch하는 것
   try {
-    console.log("saga login");
     const result = yield call(logInAPI, action.data);
     //성공
     yield put({
@@ -155,7 +146,6 @@ function signUpAPI(data) {
 function* signUp(action) {
   try {
     const result = yield call(signUpAPI, action.data);
-    console.log(result);
     //성공
     yield put({
       type: SIGN_UP_SUCCESS,
@@ -165,6 +155,28 @@ function* signUp(action) {
     //실패
     yield put({
       type: SIGN_UP_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
+function changeNicknameAPI(data) {
+  //실제 서버에 요청
+  return axios.patch("/user/nickname", { nickname: data });
+}
+
+function* changeNickname(action) {
+  try {
+    const result = yield call(changeNicknameAPI, action.data);
+    //성공
+    yield put({
+      type: CHANGE_NICKNAME_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    //실패
+    yield put({
+      type: CHANGE_NICKNAME_FAILURE,
       error: err.response.data,
     });
   }
@@ -194,6 +206,10 @@ function* watchSignUp() {
   yield takeLatest(SIGN_UP_REQUEST, signUp);
 }
 
+function* watchChangeNickname() {
+  yield takeLatest(CHANGE_NICKNAME_REQUEST, changeNickname);
+}
+
 export default function* userSaga() {
   yield all([
     fork(watchLoadMyInfo),
@@ -202,5 +218,6 @@ export default function* userSaga() {
     fork(watchLogIn),
     fork(watchLogOut),
     fork(watchSignUp),
+    fork(watchChangeNickname),
   ]);
 }
